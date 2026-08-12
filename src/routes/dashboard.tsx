@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Bot, ClipboardList, Landmark, Sprout, Sun } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
-import { CROPS, matchSchemes, todaysAdvice } from "@/lib/data";
+import { matchSchemes } from "@/lib/data";
+import { getCrop, localizePlace, localizedAdvice } from "@/lib/content";
 import { useI18n } from "@/lib/i18n";
 import { useProfile, useTasks } from "@/lib/store";
 
@@ -25,7 +26,7 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 function Dashboard() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { profile, loaded } = useProfile();
   const { tasks } = useTasks();
 
@@ -33,9 +34,9 @@ function Dashboard() {
     return (
       <AppLayout>
         <div className="mx-auto max-w-xl px-4 py-24 text-center">
-          <h1 className="text-2xl font-bold">Set up your farm profile first</h1>
+          <h1 className="text-2xl font-bold">{t("needProfileTitle")}</h1>
           <p className="mt-2 text-muted-foreground">
-            We need your state, crop and season to personalize the dashboard.
+{t("needProfileText")}
           </p>
           <Link
             to="/profile"
@@ -50,10 +51,13 @@ function Dashboard() {
 
   if (!profile) return <AppLayout><div className="h-64" /></AppLayout>;
 
-  const crop = CROPS.find((c) => c.key === profile.crop) ?? CROPS[0]!;
+  const crop = getCrop(lang, profile.crop);
   const schemes = matchSchemes(profile);
   const done = tasks.filter((x) => x.done).length;
-  const advice = todaysAdvice(profile.crop, profile.season, profile.district);
+  const advice = localizedAdvice(lang, profile.crop, profile.season, profile.district);
+  const districtL = localizePlace(lang, profile.district);
+  const stateL = localizePlace(lang, profile.state);
+  const seasonL = localizePlace(lang, profile.season);
 
   return (
     <AppLayout>
@@ -63,10 +67,10 @@ function Dashboard() {
         </h1>
         <div className="mt-3 flex flex-wrap gap-2 text-sm">
           {[
-            `📍 ${profile.district}, ${profile.state}`,
-            `🧭 ${profile.land} hectares`,
+            `📍 ${districtL}, ${stateL}`,
+            `🧭 ${profile.land} ${t("hectares")}`,
             `${crop.emoji} ${crop.name}`,
-            `🌤️ ${profile.season}`,
+            `🌤️ ${seasonL}`,
           ].map((chip) => (
             <span key={chip} className="rounded-full border border-border bg-card px-3 py-1.5">
               {chip}
@@ -78,39 +82,39 @@ function Dashboard() {
           <div className="card-soft p-5">
             <Sprout className="h-5 w-5 text-primary" />
             <p className="mt-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Crop Status
+              {t("cropStatus")}
             </p>
-            <p className="mt-1 text-2xl font-bold text-primary">Good</p>
-            <p className="text-xs text-muted-foreground">{crop.name} · {profile.season}</p>
+            <p className="mt-1 text-2xl font-bold text-primary">{t("good")}</p>
+            <p className="text-xs text-muted-foreground">{crop.name} · {seasonL}</p>
           </div>
 
           <Link to="/planner" className="card-soft p-5 transition-all hover:-translate-y-1 hover:shadow-card">
             <ClipboardList className="h-5 w-5 text-primary" />
             <p className="mt-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Today's Tasks
+              {t("todaysTasks")}
             </p>
             <p className="mt-1 text-2xl font-bold">
               {done} / {tasks.length}
             </p>
-            <p className="text-xs text-muted-foreground">{tasks.length - done} remaining</p>
+            <p className="text-xs text-muted-foreground">{tasks.length - done} {t("remaining")}</p>
           </Link>
 
           <Link to="/schemes" className="card-soft p-5 transition-all hover:-translate-y-1 hover:shadow-card">
             <Landmark className="h-5 w-5 text-primary" />
             <p className="mt-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Relevant Schemes
+              {t("relevantSchemes")}
             </p>
             <p className="mt-1 text-2xl font-bold">{schemes.length}</p>
-            <p className="text-xs text-muted-foreground">potentially suitable</p>
+            <p className="text-xs text-muted-foreground">{t("potentiallySuitableLower")}</p>
           </Link>
 
           <Link to="/assistant" className="card-soft p-5 transition-all hover:-translate-y-1 hover:shadow-card">
             <Bot className="h-5 w-5 text-primary" />
             <p className="mt-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              AI Assistant
+              {t("aiAssistant")}
             </p>
             <p className="mt-1 text-lg font-bold">{t("askAI")}</p>
-            <p className="text-xs text-muted-foreground">Answers in seconds</p>
+            <p className="text-xs text-muted-foreground">{t("answersInSeconds")}</p>
           </Link>
         </div>
 
@@ -121,7 +125,7 @@ function Dashboard() {
               <h2 className="text-xl font-bold">{t("whatToday")}</h2>
             </div>
             <p className="mt-1 text-sm opacity-85">
-              📍 {profile.district} · {crop.emoji} {crop.name} · 🌤️ {profile.season}
+              📍 {districtL} · {crop.emoji} {crop.name} · 🌤️ {seasonL}
             </p>
             <ul className="mt-5 space-y-3">
               {advice.map((a, i) => (
@@ -138,22 +142,22 @@ function Dashboard() {
               to="/planner"
               className="mt-6 inline-flex h-11 items-center gap-2 rounded-full bg-card px-5 text-sm font-semibold text-primary"
             >
-              Open {t("planner")} <ArrowRight className="h-4 w-4" />
+              {t("openPlanner")} <ArrowRight className="h-4 w-4" />
             </Link>
           </section>
 
           <section className="card-soft p-6">
             <h2 className="text-lg font-bold">{t("todaysAdvice")}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Key {crop.name.toLowerCase()} notes for this {profile.season} season.
+{crop.name} · {t("cropNotes")}
             </p>
             <div className="mt-4 space-y-3 text-sm">
               <div className="rounded-2xl border border-border bg-background p-4">
-                <p className="font-semibold">💧 Irrigation</p>
+                <p className="font-semibold">💧 {t("irrigationLabel")}</p>
                 <p className="mt-1 text-muted-foreground">{crop.irrigation}</p>
               </div>
               <div className="rounded-2xl border border-border bg-background p-4">
-                <p className="font-semibold">🐛 Pest watch</p>
+                <p className="font-semibold">🐛 {t("pestWatch")}</p>
                 <p className="mt-1 text-muted-foreground">{crop.pest}</p>
               </div>
             </div>
@@ -161,7 +165,7 @@ function Dashboard() {
               to="/crops"
               className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary"
             >
-              Full crop guide <ArrowRight className="h-3.5 w-3.5" />
+              {t("fullCropGuide")} <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </section>
         </div>

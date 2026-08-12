@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Bot, Send, Trash2, User } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { demoAnswer } from "@/lib/data";
+import { getCrop, localizePlace, localizedAnswer } from "@/lib/content";
 import { useI18n } from "@/lib/i18n";
 import { useProfile } from "@/lib/store";
 
@@ -30,15 +30,10 @@ interface Msg {
   text: string;
 }
 
-const SUGGESTIONS = [
-  "How often should I irrigate my onion crop?",
-  "What should I check before harvesting?",
-  "Which scheme may be useful for my farm?",
-  "How can I improve my crop management?",
-];
+const SUGGESTION_KEYS = ["sug1", "sug2", "sug3", "sug4"];
 
 function Assistant() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { profile } = useProfile();
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -60,11 +55,16 @@ function Assistant() {
     try {
       await new Promise((r) => setTimeout(r, 700));
       const prefix = profile
-        ? `For your ${profile.land} hectare ${profile.crop} farm in ${profile.district}, ${profile.state}: `
+        ? t("aiPrefix", {
+            land: profile.land,
+            crop: getCrop(lang, profile.crop).name,
+            district: localizePlace(lang, profile.district),
+            state: localizePlace(lang, profile.state),
+          })
         : "";
-      setMessages((m) => [...m, { role: "ai", text: prefix + demoAnswer(q) }]);
+      setMessages((m) => [...m, { role: "ai", text: prefix + localizedAnswer(lang, q) }]);
     } catch {
-      setError("Krushi AI could not respond right now. Please try again.");
+      setError(t("aiError"));
     } finally {
       setLoading(false);
     }
@@ -79,10 +79,10 @@ function Assistant() {
           </span>
           <div>
             <h1 className="text-2xl font-bold tracking-tight">{t("krushiAI")}</h1>
-            <p className="text-sm text-muted-foreground">Your intelligent farming assistant</p>
+            <p className="text-sm text-muted-foreground">{t("assistantSubtitle")}</p>
           </div>
           <span className="ml-auto rounded-full bg-accent px-3 py-1 text-xs font-medium text-accent-foreground">
-            Demo Mode
+            {t("demoMode")}
           </span>
         </div>
 
@@ -91,10 +91,12 @@ function Assistant() {
             {messages.length === 0 && (
               <div className="space-y-4">
                 <p className="text-sm text-muted-foreground">
-                  Ask anything about your crop, irrigation, pests or schemes. Try one of these:
+{t("suggestionsIntro")}
                 </p>
                 <div className="grid gap-2 sm:grid-cols-2">
-                  {SUGGESTIONS.map((s) => (
+                  {SUGGESTION_KEYS.map((k) => (
+                    // eslint-disable-next-line react/jsx-key
+                    ((s) => (
                     <button
                       key={s}
                       type="button"
@@ -103,7 +105,7 @@ function Assistant() {
                     >
                       {s}
                     </button>
-                  ))}
+                  ))(t(k)))}
                 </div>
               </div>
             )}
@@ -165,7 +167,7 @@ function Assistant() {
                 setMessages([]);
                 setError("");
               }}
-              aria-label="Clear chat"
+              aria-label={t("clearChat")}
               className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-border text-muted-foreground hover:bg-accent"
             >
               <Trash2 className="h-4 w-4" />
@@ -173,14 +175,14 @@ function Assistant() {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask Krushi AI a farming question..."
+              placeholder={t("askPlaceholder")}
               className="h-11 flex-1 rounded-xl border border-input bg-background px-3 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/25"
             />
             <button
               type="submit"
               disabled={loading}
               className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground disabled:opacity-50"
-              aria-label="Send"
+              aria-label={t("send")}
             >
               <Send className="h-4 w-4" />
             </button>
@@ -188,8 +190,7 @@ function Assistant() {
         </div>
 
         <p className="mt-4 text-xs text-muted-foreground">
-          Krushi AI is running in Demo Mode with offline farming knowledge, so it works without any
-          internet connection or API key during the demo.
+{t("demoModeNote")}
         </p>
       </div>
     </AppLayout>

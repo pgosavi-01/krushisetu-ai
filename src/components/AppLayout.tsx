@@ -61,7 +61,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
               type="button"
               onClick={() => setOpen((o) => !o)}
               className="grid h-9 w-9 place-items-center rounded-lg border border-border lg:hidden"
-              aria-label="Menu"
+              aria-label={t("menu")}
             >
               {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -101,8 +101,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <p className="font-medium text-foreground">{t("brand")}</p>
           <p className="mt-1">{t("tagline")}</p>
           <p className="mt-3 text-xs">
-            Demo data is used for guidance and scheme matching. Always verify official eligibility
-            and crop advisories with your local agriculture department.
+{t("footerNote")}
           </p>
         </div>
       </footer>

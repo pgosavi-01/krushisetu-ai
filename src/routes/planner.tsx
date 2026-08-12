@@ -37,7 +37,7 @@ function Planner() {
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
         <h1 className="text-3xl font-bold tracking-tight">{t("tasks")}</h1>
         <p className="mt-2 text-muted-foreground">
-          Add your own tasks, tick them off as you finish, and keep the day on track.
+{t("plannerSubtitle")}
         </p>
 
         <div className="card-soft mt-8 p-6 sm:p-8">
@@ -53,7 +53,7 @@ function Planner() {
               onClick={resetTasks}
               className="inline-flex h-10 items-center gap-2 rounded-full border border-border px-4 text-sm font-medium hover:bg-accent"
             >
-              <RotateCcw className="h-4 w-4" /> Reset day
+              <RotateCcw className="h-4 w-4" /> {t("resetDay")}
             </button>
           </div>
           <div className="mt-4 h-2.5 w-full overflow-hidden rounded-full bg-muted">
@@ -75,7 +75,7 @@ function Planner() {
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Clean the drip lines"
+              placeholder={t("taskPlaceholder")}
               className="h-11 flex-1 rounded-xl border border-input bg-background px-3 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/25"
             />
             <button
@@ -95,7 +95,7 @@ function Planner() {
                 <button
                   type="button"
                   onClick={() => toggleTask(task.id)}
-                  aria-label={task.done ? "Mark as pending" : "Mark as complete"}
+                  aria-label={task.done ? t("markPending") : t("markComplete")}
                   className={`grid h-6 w-6 shrink-0 place-items-center rounded-md border transition-colors ${
                     task.done ? "border-primary bg-primary text-primary-foreground" : "border-input"
                   }`}
@@ -110,7 +110,7 @@ function Planner() {
                 <button
                   type="button"
                   onClick={() => deleteTask(task.id)}
-                  aria-label="Delete task"
+                  aria-label={t("deleteTask")}
                   className="text-muted-foreground transition-colors hover:text-destructive"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -119,7 +119,7 @@ function Planner() {
             ))}
             {tasks.length === 0 && (
               <li className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-                No tasks yet. Add your first task for today.
+{t("noTasks")}
               </li>
             )}
           </ul>
