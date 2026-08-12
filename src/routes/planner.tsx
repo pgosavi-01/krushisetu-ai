@@ -21,7 +21,7 @@ export const Route = createFileRoute("/planner")({
       },
     ],
   }),
-  component: Planner;
+  component: Planner,
 });
 
 function Planner() {
