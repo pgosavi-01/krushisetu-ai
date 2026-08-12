@@ -3,6 +3,7 @@ import { AlertTriangle, ArrowRight, X } from "lucide-react";
 import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { SCHEMES, matchSchemes, type Scheme } from "@/lib/data";
+import { getCrop, localizePlace, localizeScheme } from "@/lib/content";
 import { useI18n } from "@/lib/i18n";
 import { useProfile } from "@/lib/store";
 
@@ -26,23 +27,28 @@ export const Route = createFileRoute("/schemes")({
 });
 
 function SchemesPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { profile } = useProfile();
   const [open, setOpen] = useState<Scheme | null>(null);
   const [showAll, setShowAll] = useState(false);
 
   const matched = profile ? matchSchemes(profile) : [];
   const matchedIds = new Set(matched.map((s) => s.id));
-  const list = profile && !showAll ? matched : SCHEMES;
+  const list = (profile && !showAll ? matched : SCHEMES).map((s) => localizeScheme(lang, s));
 
   return (
     <AppLayout>
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
-        <h1 className="text-3xl font-bold tracking-tight">Government Schemes</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t("schemesTitle")}</h1>
         <p className="mt-2 max-w-2xl text-muted-foreground">
           {profile
-            ? `Based on ${profile.state}, ${profile.land} hectares and ${profile.crop} farming, ${matched.length} schemes look potentially suitable.`
-            : "Create your farmer profile to see schemes matched to your farm."}
+            ? t("schemesMatched", {
+                state: localizePlace(lang, profile.state),
+                land: profile.land,
+                crop: getCrop(lang, profile.crop).name,
+                count: matched.length,
+              })
+            : t("schemesNoProfile")}
         </p>
 
         {!profile && (
@@ -60,7 +66,7 @@ function SchemesPage() {
             onClick={() => setShowAll((v) => !v)}
             className="mt-4 h-10 rounded-full border border-border bg-card px-5 text-sm font-medium hover:bg-accent"
           >
-            {showAll ? "Show matched only" : "Show all schemes"}
+            {showAll ? t("showMatchedOnly") : t("showAllSchemes")}
           </button>
         )}
 
@@ -75,7 +81,7 @@ function SchemesPage() {
               <h2 className="text-base font-semibold">{s.name}</h2>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.description}</p>
               <p className="mt-3 text-sm">
-                <span className="font-medium">Benefits: </span>
+                <span className="font-medium">{t("benefits")}: </span>
                 <span className="text-muted-foreground">{s.benefits}</span>
               </p>
               <button
@@ -92,9 +98,7 @@ function SchemesPage() {
         <div className="mt-8 flex gap-3 rounded-2xl border border-border bg-card p-5 text-sm text-muted-foreground">
           <AlertTriangle className="h-5 w-5 shrink-0 text-primary" />
           <p>
-            Scheme matching uses demo eligibility rules for this MVP and does not confirm official
-            eligibility. Please verify details and apply through the relevant government authority or
-            your local agriculture office.
+{t("schemeDisclaimer")}
           </p>
         </div>
       </div>
@@ -114,7 +118,7 @@ function SchemesPage() {
                 type="button"
                 onClick={() => setOpen(null)}
                 className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border"
-                aria-label="Close"
+                aria-label={t("close")}
               >
                 <X className="h-4 w-4" />
               </button>
@@ -122,15 +126,15 @@ function SchemesPage() {
             <p className="mt-3 text-sm text-muted-foreground">{open.description}</p>
             <div className="mt-5 space-y-4 text-sm">
               <div>
-                <p className="font-semibold">Benefits</p>
+                <p className="font-semibold">{t("benefits")}</p>
                 <p className="text-muted-foreground">{open.benefits}</p>
               </div>
               <div>
-                <p className="font-semibold">Basic eligibility</p>
+                <p className="font-semibold">{t("eligibility")}</p>
                 <p className="text-muted-foreground">{open.eligibility}</p>
               </div>
               <div>
-                <p className="font-semibold">Required documents</p>
+                <p className="font-semibold">{t("requiredDocuments")}</p>
                 <ul className="mt-1 list-disc pl-5 text-muted-foreground">
                   {open.documents.map((d) => (
                     <li key={d}>{d}</li>
@@ -139,7 +143,7 @@ function SchemesPage() {
               </div>
             </div>
             <p className="mt-5 rounded-xl bg-muted p-3 text-xs text-muted-foreground">
-              Official eligibility must be verified with the relevant government authority.
+{t("officialNote")}
             </p>
           </div>
         </div>

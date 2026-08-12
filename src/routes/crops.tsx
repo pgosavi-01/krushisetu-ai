@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { CROPS, type CropKey } from "@/lib/data";
+import { type CropKey } from "@/lib/data";
+import { getCrops, localizePlace } from "@/lib/content";
+import { useI18n } from "@/lib/i18n";
 import { useProfile } from "@/lib/store";
 
 export const Route = createFileRoute("/crops")({
@@ -24,24 +26,26 @@ export const Route = createFileRoute("/crops")({
 });
 
 const SECTIONS = [
-  { key: "sowing", emoji: "🌱", label: "Sowing" },
-  { key: "irrigation", emoji: "💧", label: "Irrigation" },
-  { key: "fertilizer", emoji: "🌿", label: "Fertilizer" },
-  { key: "pest", emoji: "🐛", label: "Pest Management" },
-  { key: "harvest", emoji: "🌾", label: "Harvesting" },
+  { key: "sowing", emoji: "🌱", label: "sowing" },
+  { key: "irrigation", emoji: "💧", label: "irrigation" },
+  { key: "fertilizer", emoji: "🌿", label: "fertilizer" },
+  { key: "pest", emoji: "🐛", label: "pestManagement" },
+  { key: "harvest", emoji: "🌾", label: "harvesting" },
 ] as const;
 
 function CropsPage() {
+  const { t, lang } = useI18n();
   const { profile } = useProfile();
+  const CROPS = getCrops(lang);
   const [selected, setSelected] = useState<CropKey | null>(null);
   const active = CROPS.find((c) => c.key === (selected ?? profile?.crop ?? "onion")) ?? CROPS[0]!;
 
   return (
     <AppLayout>
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
-        <h1 className="text-3xl font-bold tracking-tight">Crop Guidance</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t("cropGuideTitle")}</h1>
         <p className="mt-2 text-muted-foreground">
-          Choose a crop to see practical guidance for each stage of the season.
+{t("cropGuideSubtitle")}
         </p>
 
         <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
@@ -58,7 +62,7 @@ function CropsPage() {
             >
               <span className="text-2xl">{c.emoji}</span>
               <p className="mt-2 text-sm font-semibold">{c.name}</p>
-              <p className="text-xs opacity-75">{c.season}</p>
+              <p className="text-xs opacity-75">{localizePlace(lang, c.season)}</p>
             </button>
           ))}
         </div>
@@ -70,7 +74,7 @@ function CropsPage() {
             </span>
             <div>
               <h2 className="text-xl font-bold">{active.name}</h2>
-              <p className="text-sm text-muted-foreground">Season: {active.season}</p>
+              <p className="text-sm text-muted-foreground">{t("seasonLabel")}: {active.season}</p>
             </div>
           </div>
 
@@ -78,7 +82,7 @@ function CropsPage() {
             {SECTIONS.map((s) => (
               <div key={s.key} className="rounded-2xl border border-border bg-background p-5">
                 <h3 className="flex items-center gap-2 text-sm font-semibold">
-                  <span className="text-lg">{s.emoji}</span> {s.label}
+                  <span className="text-lg">{s.emoji}</span> {t(s.label)}
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{active[s.key]}</p>
               </div>
