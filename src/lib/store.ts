@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import type { CropKey } from "./data";
-import { DEFAULT_TASKS } from "./data";
+import { getDefaultTasks } from "./content";
+import { useI18n } from "./i18n";
 
 export interface FarmerProfile {
   name: string;
@@ -17,47 +18,109 @@ export interface Task {
   done: boolean;
 }
 
-const PROFILE_KEY = "ks_profile";
-const TASKS_KEY = "ks_tasks";
+export const PROFILE_KEY = "krushisetu_farmer_profile";
+const LEGACY_PROFILE_KEY = "ks_profile";
+const TASKS_KEY = "krushisetu_tasks";
+const LEGACY_TASKS_KEY = "ks_tasks";
+
+/* ---------------- Tiny persistent store with subscribers ---------------- */
+
+let profileCache: FarmerProfile | null = null;
+let hydrated = false;
+const listeners = new Set<() => void>();
+
+function isValidProfile(p: unknown): p is FarmerProfile {
+  if (!p || typeof p !== "object") return false;
+  const o = p as Record<string, unknown>;
+  return typeof o["name"] === "string" && o["name"].trim().length > 0 && typeof o["crop"] === "string";
+}
+
+function hydrate() {
+  if (hydrated || typeof window === "undefined") return;
+  hydrated = true;
+  try {
+    const raw = localStorage.getItem(PROFILE_KEY) ?? localStorage.getItem(LEGACY_PROFILE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as unknown;
+      if (isValidProfile(parsed)) {
+        profileCache = { ...parsed, land: Number(parsed.land) || 0 };
+        localStorage.setItem(PROFILE_KEY, JSON.stringify(profileCache));
+      }
+    }
+  } catch {
+    /* ignore */
+  }
+}
+
+function emit() {
+  listeners.forEach((l) => l());
+}
+
+function subscribe(cb: () => void) {
+  listeners.add(cb);
+  const onStorage = (e: StorageEvent) => {
+    if (e.key === PROFILE_KEY) {
+      hydrated = false;
+      hydrate();
+      emit();
+    }
+  };
+  window.addEventListener("storage", onStorage);
+  return () => {
+    listeners.delete(cb);
+    window.removeEventListener("storage", onStorage);
+  };
+}
 
 export function useProfile() {
-  const [profile, setProfileState] = useState<FarmerProfile | null>(null);
+  const profile = useSyncExternalStore(
+    subscribe,
+    () => {
+      hydrate();
+      return profileCache;
+    },
+    () => null,
+  );
   const [loaded, setLoaded] = useState(false);
+  useEffect(() => setLoaded(true), []);
 
-  useEffect(() => {
+  const setProfile = useCallback((p: FarmerProfile) => {
+    profileCache = p;
+    hydrated = true;
     try {
-      const raw = localStorage.getItem(PROFILE_KEY);
-      if (raw) setProfileState(JSON.parse(raw) as FarmerProfile);
+      localStorage.setItem(PROFILE_KEY, JSON.stringify(p));
     } catch {
       /* ignore */
     }
-    setLoaded(true);
-  }, []);
-
-  const setProfile = useCallback((p: FarmerProfile) => {
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(p));
-    setProfileState(p);
+    emit();
   }, []);
 
   const clearProfile = useCallback(() => {
-    localStorage.removeItem(PROFILE_KEY);
-    setProfileState(null);
+    profileCache = null;
+    try {
+      localStorage.removeItem(PROFILE_KEY);
+      localStorage.removeItem(LEGACY_PROFILE_KEY);
+    } catch {
+      /* ignore */
+    }
+    emit();
   }, []);
 
   return { profile, setProfile, clearProfile, loaded };
 }
 
 export function useTasks() {
+  const { lang } = useI18n();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(TASKS_KEY);
+      const raw = localStorage.getItem(TASKS_KEY) ?? localStorage.getItem(LEGACY_TASKS_KEY);
       if (raw) {
         setTasks(JSON.parse(raw) as Task[]);
       } else {
-        const seed = DEFAULT_TASKS.map((title, i) => ({ id: `t${i}`, title, done: false }));
+        const seed = getDefaultTasks(lang).map((title, i) => ({ id: `t${i}`, title, done: false }));
         setTasks(seed);
         localStorage.setItem(TASKS_KEY, JSON.stringify(seed));
       }
@@ -65,22 +128,26 @@ export function useTasks() {
       /* ignore */
     }
     setLoaded(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const persist = (next: Task[]) => {
     setTasks(next);
-    localStorage.setItem(TASKS_KEY, JSON.stringify(next));
+    try {
+      localStorage.setItem(TASKS_KEY, JSON.stringify(next));
+    } catch {
+      /* ignore */
+    }
   };
 
   return {
     tasks,
     loaded,
-    addTask: (title: string) =>
-      persist([...tasks, { id: `t${Date.now()}`, title, done: false }]),
+    addTask: (title: string) => persist([...tasks, { id: `t${Date.now()}`, title, done: false }]),
     toggleTask: (id: string) =>
       persist(tasks.map((t) => (t.id === id ? { ...t, done: !t.done } : t))),
     deleteTask: (id: string) => persist(tasks.filter((t) => t.id !== id)),
     resetTasks: () =>
-      persist(DEFAULT_TASKS.map((title, i) => ({ id: `t${i}`, title, done: false }))),
+      persist(getDefaultTasks(lang).map((title, i) => ({ id: `t${i}`, title, done: false }))),
   };
 }
