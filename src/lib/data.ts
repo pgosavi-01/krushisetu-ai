@@ -215,15 +215,20 @@ export const DEFAULT_TASKS = [
   "Inspect for pests",
 ];
 
+function firstSentence(text: string): string {
+  return text.split(".")[0] ?? text;
+}
+
 export function todaysAdvice(crop: CropKey, season: string, district: string): string[] {
-  const guide = CROPS.find((c) => c.key === crop)!;
+  const guide = CROPS.find((c) => c.key === crop) ?? CROPS[0]!;
   return [
     `Check soil moisture in your ${guide.name.toLowerCase()} field early in the morning before the heat rises.`,
-    `Inspect leaves for early pest signs. ${guide.pest.split(".")[0]}.`,
-    `Review your irrigation plan: ${guide.irrigation.split(".")[0].toLowerCase()}.`,
+    `Inspect leaves for early pest signs. ${firstSentence(guide.pest)}.`,
+    `Review your irrigation plan: ${firstSentence(guide.irrigation).toLowerCase()}.`,
     `${season} weather around ${district} can change quickly — complete field work before noon and log today's farm task.`,
   ];
 }
+
 
 export const DEMO_AI_RESPONSES: { match: string[]; answer: string }[] = [
   {
