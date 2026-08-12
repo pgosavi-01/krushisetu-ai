@@ -72,10 +72,7 @@ function Landing() {
         <div className="absolute inset-0 gradient-hero opacity-90" />
         <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:py-32">
           <div className="max-w-2xl text-primary-foreground">
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/25 bg-primary-foreground/10 px-3 py-1 text-xs font-medium">
-              <LogoMark className="h-4 w-4" /> Hack Devengers 1.0
-            </span>
-            <h1 className="mt-5 text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+            <h1 className="text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
               {t("brand")}
             </h1>
             <p className="mt-4 text-lg font-medium opacity-95 sm:text-xl">{t("tagline")}</p>
