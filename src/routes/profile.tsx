@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { CROPS, SEASONS, STATES, type CropKey } from "@/lib/data";
+import { SEASONS, STATES, type CropKey } from "@/lib/data";
+import { getCrops, localizePlace } from "@/lib/content";
 import { useI18n } from "@/lib/i18n";
 import { useProfile } from "@/lib/store";
 
@@ -25,7 +26,8 @@ export const Route = createFileRoute("/profile")({
 });
 
 function ProfilePage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const CROPS = getCrops(lang);
   const navigate = useNavigate();
   const { profile, setProfile, clearProfile, loaded } = useProfile();
 
@@ -53,8 +55,8 @@ function ProfilePage() {
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     const landNum = Number(land);
-    if (!name.trim()) return setError("Please enter the farmer's name.");
-    if (!Number.isFinite(landNum) || landNum <= 0) return setError("Enter a valid land size in hectares.");
+    if (!name.trim()) return setError(t("errName"));
+    if (!Number.isFinite(landNum) || landNum <= 0) return setError(t("errLand"));
     setError("");
     setProfile({ name: name.trim(), state, district, land: landNum, crop, season });
     navigate({ to: "/dashboard" });
@@ -65,29 +67,29 @@ function ProfilePage() {
   return (
     <AppLayout>
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
-        <h1 className="text-3xl font-bold tracking-tight">{t("profile")}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{profile ? t("editProfile") : t("createProfile")}</h1>
         <p className="mt-2 text-muted-foreground">
-          Tell us about your farm once. We store it on this device and personalize everything else.
+{t("profileIntro")}
         </p>
 
         <form onSubmit={submit} className="card-soft mt-8 p-6 sm:p-8">
           <div className="grid gap-5 sm:grid-cols-2">
             <div className="sm:col-span-2">
               <label htmlFor="name" className="text-sm font-medium">
-                Farmer Name
+                {t("farmerName")}
               </label>
               <input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Ramesh"
+                placeholder={t("farmerNamePlaceholder")}
                 className={field}
               />
             </div>
 
             <div>
               <label htmlFor="state" className="text-sm font-medium">
-                State
+                {t("state")}
               </label>
               <select
                 id="state"
@@ -99,14 +101,14 @@ function ProfilePage() {
                 className={field}
               >
                 {Object.keys(STATES).map((s) => (
-                  <option key={s}>{s}</option>
+                  <option key={s} value={s}>{localizePlace(lang, s)}</option>
                 ))}
               </select>
             </div>
 
             <div>
               <label htmlFor="district" className="text-sm font-medium">
-                District
+                {t("district")}
               </label>
               <select
                 id="district"
@@ -115,14 +117,14 @@ function ProfilePage() {
                 className={field}
               >
                 {districts.map((d) => (
-                  <option key={d}>{d}</option>
+                  <option key={d} value={d}>{localizePlace(lang, d)}</option>
                 ))}
               </select>
             </div>
 
             <div>
               <label htmlFor="land" className="text-sm font-medium">
-                Land Size (hectares)
+                {t("landSize")}
               </label>
               <input
                 id="land"
@@ -137,7 +139,7 @@ function ProfilePage() {
 
             <div>
               <label htmlFor="crop" className="text-sm font-medium">
-                Main Crop
+                {t("mainCrop")}
               </label>
               <select
                 id="crop"
@@ -154,7 +156,7 @@ function ProfilePage() {
             </div>
 
             <div className="sm:col-span-2">
-              <span className="text-sm font-medium">Season</span>
+              <span className="text-sm font-medium">{t("season")}</span>
               <div className="mt-2 flex flex-wrap gap-2">
                 {SEASONS.map((s) => (
                   <button
@@ -167,7 +169,7 @@ function ProfilePage() {
                         : "border-border bg-card text-muted-foreground hover:bg-accent"
                     }`}
                   >
-                    {s}
+                    {localizePlace(lang, s)}
                   </button>
                 ))}
               </div>
@@ -181,7 +183,7 @@ function ProfilePage() {
               type="submit"
               className="h-11 rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
-              {t("save")}
+              {t("saveProfile")}
             </button>
             {loaded && profile && (
               <button
@@ -192,7 +194,7 @@ function ProfilePage() {
                 }}
                 className="h-11 rounded-full border border-border px-6 text-sm font-medium text-muted-foreground hover:bg-accent"
               >
-                Clear saved profile
+                {t("clearProfile")}
               </button>
             )}
           </div>

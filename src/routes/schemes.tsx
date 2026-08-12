@@ -29,7 +29,8 @@ export const Route = createFileRoute("/schemes")({
 function SchemesPage() {
   const { t, lang } = useI18n();
   const { profile } = useProfile();
-  const [open, setOpen] = useState<Scheme | null>(null);
+  const [openRaw, setOpen] = useState<Scheme | null>(null);
+  const open = openRaw ? localizeScheme(lang, openRaw) : null;
   const [showAll, setShowAll] = useState(false);
 
   const matched = profile ? matchSchemes(profile) : [];
