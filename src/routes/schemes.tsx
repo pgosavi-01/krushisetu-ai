@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AlertTriangle, ArrowRight, X } from "lucide-react";
+import { AlertTriangle, ArrowRight, X, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { SCHEMES, matchSchemes, type Scheme } from "@/lib/data";
