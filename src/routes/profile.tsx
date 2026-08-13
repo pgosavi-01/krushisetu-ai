@@ -34,6 +34,7 @@ function ProfilePage() {
   const [name, setName] = useState("");
   const [state, setState] = useState("Maharashtra");
   const [district, setDistrict] = useState("Nashik");
+  const [city, setCity] = useState("Sinnar");
   const [land, setLand] = useState("2");
   const [crop, setCrop] = useState<CropKey>("onion");
   const [season, setSeason] = useState<string>("Rabi");
@@ -44,6 +45,7 @@ function ProfilePage() {
       setName(profile.name);
       setState(profile.state);
       setDistrict(profile.district);
+      setCity(profile.city || profile.district);
       setLand(String(profile.land));
       setCrop(profile.crop);
       setSeason(profile.season);
@@ -58,9 +60,18 @@ function ProfilePage() {
     if (!name.trim()) return setError(t("errName"));
     if (!Number.isFinite(landNum) || landNum <= 0) return setError(t("errLand"));
     setError("");
-    setProfile({ name: name.trim(), state, district, land: landNum, crop, season });
+    setProfile({
+      name: name.trim(),
+      state,
+      district,
+      city: city.trim() || district,
+      land: landNum,
+      crop,
+      season,
+    });
     navigate({ to: "/dashboard" });
   };
+
 
   const field = "mt-1.5 h-11 w-full rounded-xl border border-input bg-card px-3 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/25";
 
