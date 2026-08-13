@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Check, Plus, RotateCcw, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
+import { RemindersPanel } from "@/components/RemindersPanel";
 import { useI18n } from "@/lib/i18n";
 import { useTasks } from "@/lib/store";
 
@@ -123,6 +124,10 @@ function Planner() {
               </li>
             )}
           </ul>
+        </div>
+
+        <div className="mt-8">
+          <RemindersPanel />
         </div>
       </div>
     </AppLayout>

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AlertTriangle, ArrowRight, X } from "lucide-react";
+import { AlertTriangle, ArrowRight, X, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { SCHEMES, matchSchemes, type Scheme } from "@/lib/data";
@@ -143,6 +143,16 @@ function SchemesPage() {
                 </ul>
               </div>
             </div>
+            {(open as { officialUrl?: string }).officialUrl && (
+              <a
+                href={(open as { officialUrl?: string }).officialUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-5 inline-flex h-11 items-center gap-2 rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground"
+              >
+                {t("visitOfficialSite")} <ExternalLink className="h-4 w-4" />
+              </a>
+            )}
             <p className="mt-5 rounded-xl bg-muted p-3 text-xs text-muted-foreground">
 {t("officialNote")}
             </p>

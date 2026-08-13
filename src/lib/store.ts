@@ -7,6 +7,8 @@ export interface FarmerProfile {
   name: string;
   state: string;
   district: string;
+  /** Specific city/town used for weather; falls back to district when empty. */
+  city: string;
   land: number;
   crop: CropKey;
   season: string;
@@ -18,10 +20,53 @@ export interface Task {
   done: boolean;
 }
 
+export type ReminderCategory =
+  | "irrigation"
+  | "fertilizer"
+  | "pest"
+  | "sowing"
+  | "harvesting"
+  | "inspection"
+  | "custom";
+
+export const REMINDER_CATEGORIES: ReminderCategory[] = [
+  "irrigation",
+  "fertilizer",
+  "pest",
+  "sowing",
+  "harvesting",
+  "inspection",
+  "custom",
+];
+
+export const REMINDER_EMOJI: Record<ReminderCategory, string> = {
+  irrigation: "💧",
+  fertilizer: "🌿",
+  pest: "🐛",
+  sowing: "🌱",
+  harvesting: "🌾",
+  inspection: "🔍",
+  custom: "📌",
+};
+
+export interface Reminder {
+  id: string;
+  title: string;
+  description: string;
+  /** YYYY-MM-DD */
+  date: string;
+  /** HH:MM, optional */
+  time?: string;
+  category: ReminderCategory;
+  done: boolean;
+}
+
 export const PROFILE_KEY = "krushisetu_farmer_profile";
 const LEGACY_PROFILE_KEY = "ks_profile";
 const TASKS_KEY = "krushisetu_tasks";
 const LEGACY_TASKS_KEY = "ks_tasks";
+export const REMINDERS_KEY = "krushisetu_reminders";
+
 
 /* ---------------- Tiny persistent store with subscribers ---------------- */
 
@@ -43,7 +88,12 @@ function hydrate() {
     if (raw) {
       const parsed = JSON.parse(raw) as unknown;
       if (isValidProfile(parsed)) {
-        profileCache = { ...parsed, land: Number(parsed.land) || 0 };
+        profileCache = {
+          ...parsed,
+          land: Number(parsed.land) || 0,
+          city: typeof parsed.city === "string" && parsed.city ? parsed.city : parsed.district,
+        };
+
         localStorage.setItem(PROFILE_KEY, JSON.stringify(profileCache));
       }
     }
@@ -149,5 +199,52 @@ export function useTasks() {
     deleteTask: (id: string) => persist(tasks.filter((t) => t.id !== id)),
     resetTasks: () =>
       persist(getDefaultTasks(lang).map((title, i) => ({ id: `t${i}`, title, done: false }))),
+  };
+}
+
+/* ---------------- Reminders ---------------- */
+
+function readReminders(): Reminder[] {
+  try {
+    const raw = localStorage.getItem(REMINDERS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as Reminder[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+export function useReminders() {
+  const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    setReminders(readReminders());
+    setLoaded(true);
+  }, []);
+
+  const persist = useCallback((next: Reminder[]) => {
+    const sorted = [...next].sort((a, b) =>
+      `${a.date}${a.time ?? ""}`.localeCompare(`${b.date}${b.time ?? ""}`),
+    );
+    setReminders(sorted);
+    try {
+      localStorage.setItem(REMINDERS_KEY, JSON.stringify(sorted));
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  return {
+    reminders,
+    loaded,
+    addReminder: (r: Omit<Reminder, "id" | "done">) =>
+      persist([...reminders, { ...r, id: `r${Date.now()}`, done: false }]),
+    updateReminder: (id: string, patch: Partial<Reminder>) =>
+      persist(reminders.map((r) => (r.id === id ? { ...r, ...patch } : r))),
+    toggleReminder: (id: string) =>
+      persist(reminders.map((r) => (r.id === id ? { ...r, done: !r.done } : r))),
+    deleteReminder: (id: string) => persist(reminders.filter((r) => r.id !== id)),
   };
 }
