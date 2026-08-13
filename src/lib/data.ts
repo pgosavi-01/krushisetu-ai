@@ -112,6 +112,8 @@ export interface Scheme {
   benefits: string;
   eligibility: string;
   documents: string[];
+  /** Verified official government URL; omitted when none is available. */
+  officialUrl?: string;
   maxLand?: number;
   states?: string[];
   crops?: CropKey[];
@@ -120,6 +122,7 @@ export interface Scheme {
 export const SCHEMES: Scheme[] = [
   {
     id: "pm-kisan",
+    officialUrl: "https://pmkisan.gov.in/",
     name: "PM-KISAN Samman Nidhi",
     description:
       "Income support scheme for land-holding farmer families across India, paid directly into the bank account.",
@@ -130,6 +133,7 @@ export const SCHEMES: Scheme[] = [
   },
   {
     id: "pmfby",
+    officialUrl: "https://pmfby.gov.in/",
     name: "Pradhan Mantri Fasal Bima Yojana",
     description:
       "Crop insurance scheme protecting farmers against yield loss due to natural calamities, pests and diseases.",
@@ -139,6 +143,7 @@ export const SCHEMES: Scheme[] = [
   },
   {
     id: "soil-health",
+    officialUrl: "https://soilhealth.dac.gov.in/",
     name: "Soil Health Card Scheme",
     description:
       "Provides a soil health card with nutrient status of your field and crop-wise fertilizer recommendations.",
@@ -148,6 +153,7 @@ export const SCHEMES: Scheme[] = [
   },
   {
     id: "pmksy",
+    officialUrl: "https://pmksy.gov.in/",
     name: "PM Krishi Sinchayee Yojana (Per Drop More Crop)",
     description:
       "Support for micro-irrigation such as drip and sprinkler systems to improve water use efficiency.",
@@ -158,6 +164,7 @@ export const SCHEMES: Scheme[] = [
   },
   {
     id: "mahadbt-horti",
+    officialUrl: "https://mahadbt.maharashtra.gov.in/Farmer/Login/Login",
     name: "MahaDBT Horticulture Support (Maharashtra)",
     description:
       "State scheme supporting horticulture and vegetable growers with planting material, shade nets and storage.",
@@ -169,6 +176,7 @@ export const SCHEMES: Scheme[] = [
   },
   {
     id: "kcc",
+    officialUrl: "https://www.myscheme.gov.in/schemes/kcc",
     name: "Kisan Credit Card",
     description:
       "Short-term institutional credit for crop production, post-harvest expenses and farm maintenance.",
@@ -178,6 +186,7 @@ export const SCHEMES: Scheme[] = [
   },
   {
     id: "enam",
+    officialUrl: "https://www.enam.gov.in/web/",
     name: "e-NAM Online Market Access",
     description:
       "National online agricultural market connecting farmers to buyers across mandis for transparent price discovery.",
