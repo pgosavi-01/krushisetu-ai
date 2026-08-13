@@ -94,19 +94,21 @@ function Assistant() {
 {t("suggestionsIntro")}
                 </p>
                 <div className="grid gap-2 sm:grid-cols-2">
-                  {SUGGESTION_KEYS.map((k) => (
-                    // eslint-disable-next-line react/jsx-key
-                    ((s) => (
-                    <button
-                      key={s}
-                      type="button"
-                      onClick={() => void send(s)}
-                      className="rounded-2xl border border-border bg-background p-3 text-left text-sm hover:bg-accent"
-                    >
-                      {s}
-                    </button>
-                  ))(t(k)))}
+                  {SUGGESTION_KEYS.map((k) => {
+                    const s = t(k);
+                    return (
+                      <button
+                        key={k}
+                        type="button"
+                        onClick={() => void send(s)}
+                        className="rounded-2xl border border-border bg-background p-3 text-left text-sm hover:bg-accent"
+                      >
+                        {s}
+                      </button>
+                    );
+                  })}
                 </div>
+
               </div>
             )}
 
