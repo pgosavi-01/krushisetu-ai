@@ -134,6 +134,22 @@ function ProfilePage() {
             </div>
 
             <div>
+              <label htmlFor="city" className="text-sm font-medium">
+                {t("cityTown")}
+              </label>
+              <input
+                id="city"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder={t("cityPlaceholder")}
+                className={field}
+              />
+              <p className="mt-1 text-xs text-muted-foreground">{t("cityHelp")}</p>
+            </div>
+
+
+
+            <div>
               <label htmlFor="land" className="text-sm font-medium">
                 {t("landSize")}
               </label>
