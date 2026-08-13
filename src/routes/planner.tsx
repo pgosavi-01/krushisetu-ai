@@ -124,6 +124,10 @@ function Planner() {
             )}
           </ul>
         </div>
+
+        <div className="mt-8">
+          <RemindersPanel />
+        </div>
       </div>
     </AppLayout>
   );
