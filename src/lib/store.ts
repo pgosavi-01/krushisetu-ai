@@ -88,7 +88,12 @@ function hydrate() {
     if (raw) {
       const parsed = JSON.parse(raw) as unknown;
       if (isValidProfile(parsed)) {
-        profileCache = { ...parsed, land: Number(parsed.land) || 0 };
+        profileCache = {
+          ...parsed,
+          land: Number(parsed.land) || 0,
+          city: typeof parsed.city === "string" && parsed.city ? parsed.city : parsed.district,
+        };
+
         localStorage.setItem(PROFILE_KEY, JSON.stringify(profileCache));
       }
     }
