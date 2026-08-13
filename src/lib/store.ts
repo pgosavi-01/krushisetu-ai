@@ -201,3 +201,50 @@ export function useTasks() {
       persist(getDefaultTasks(lang).map((title, i) => ({ id: `t${i}`, title, done: false }))),
   };
 }
+
+/* ---------------- Reminders ---------------- */
+
+function readReminders(): Reminder[] {
+  try {
+    const raw = localStorage.getItem(REMINDERS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as Reminder[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+export function useReminders() {
+  const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    setReminders(readReminders());
+    setLoaded(true);
+  }, []);
+
+  const persist = useCallback((next: Reminder[]) => {
+    const sorted = [...next].sort((a, b) =>
+      `${a.date}${a.time ?? ""}`.localeCompare(`${b.date}${b.time ?? ""}`),
+    );
+    setReminders(sorted);
+    try {
+      localStorage.setItem(REMINDERS_KEY, JSON.stringify(sorted));
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  return {
+    reminders,
+    loaded,
+    addReminder: (r: Omit<Reminder, "id" | "done">) =>
+      persist([...reminders, { ...r, id: `r${Date.now()}`, done: false }]),
+    updateReminder: (id: string, patch: Partial<Reminder>) =>
+      persist(reminders.map((r) => (r.id === id ? { ...r, ...patch } : r))),
+    toggleReminder: (id: string) =>
+      persist(reminders.map((r) => (r.id === id ? { ...r, done: !r.done } : r))),
+    deleteReminder: (id: string) => persist(reminders.filter((r) => r.id !== id)),
+  };
+}
