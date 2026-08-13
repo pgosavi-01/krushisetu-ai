@@ -7,6 +7,8 @@ export interface FarmerProfile {
   name: string;
   state: string;
   district: string;
+  /** Specific city/town used for weather; falls back to district when empty. */
+  city: string;
   land: number;
   crop: CropKey;
   season: string;
@@ -18,10 +20,53 @@ export interface Task {
   done: boolean;
 }
 
+export type ReminderCategory =
+  | "irrigation"
+  | "fertilizer"
+  | "pest"
+  | "sowing"
+  | "harvesting"
+  | "inspection"
+  | "custom";
+
+export const REMINDER_CATEGORIES: ReminderCategory[] = [
+  "irrigation",
+  "fertilizer",
+  "pest",
+  "sowing",
+  "harvesting",
+  "inspection",
+  "custom",
+];
+
+export const REMINDER_EMOJI: Record<ReminderCategory, string> = {
+  irrigation: "💧",
+  fertilizer: "🌿",
+  pest: "🐛",
+  sowing: "🌱",
+  harvesting: "🌾",
+  inspection: "🔍",
+  custom: "📌",
+};
+
+export interface Reminder {
+  id: string;
+  title: string;
+  description: string;
+  /** YYYY-MM-DD */
+  date: string;
+  /** HH:MM, optional */
+  time?: string;
+  category: ReminderCategory;
+  done: boolean;
+}
+
 export const PROFILE_KEY = "krushisetu_farmer_profile";
 const LEGACY_PROFILE_KEY = "ks_profile";
 const TASKS_KEY = "krushisetu_tasks";
 const LEGACY_TASKS_KEY = "ks_tasks";
+export const REMINDERS_KEY = "krushisetu_reminders";
+
 
 /* ---------------- Tiny persistent store with subscribers ---------------- */
 
