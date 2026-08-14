@@ -757,6 +757,79 @@ Object.assign(en, EXTRA_EN);
 Object.assign(mr, EXTRA_MR);
 Object.assign(hi, EXTRA_HI);
 
+
+/* -------- Location & crop selector strings -------- */
+
+const SEL_EN: Dict = {
+  selectState: "Select State",
+  selectDistrict: "Select District",
+  selectCity: "Select City / Town",
+  selectMainCrop: "Select Main Crop",
+  searchPlaceholder: "Type to search...",
+  noResults: "No matches found",
+  clearSelection: "Clear",
+  selectStateFirst: "Select a state first",
+  selectDistrictFirst: "Select a district first",
+  customCropLabel: "Enter your crop",
+  customCropPlaceholder: "e.g. Dragon fruit",
+  searchingCities: "Searching towns...",
+  cityTypeHint: "Type at least 2 letters to search towns in this district.",
+  cityUseTyped: 'Use "{name}" as typed',
+  errState: "Please select your state.",
+  errDistrict: "Please select your district.",
+  errCity: "Please select your city or town.",
+  errCrop: "Please select your main crop.",
+  errCustomCrop: "Please enter your crop name.",
+};
+
+const SEL_MR: Dict = {
+  selectState: "राज्य निवडा",
+  selectDistrict: "जिल्हा निवडा",
+  selectCity: "शहर / गाव निवडा",
+  selectMainCrop: "मुख्य पीक निवडा",
+  searchPlaceholder: "शोधण्यासाठी टाइप करा...",
+  noResults: "काहीही सापडले नाही",
+  clearSelection: "काढा",
+  selectStateFirst: "आधी राज्य निवडा",
+  selectDistrictFirst: "आधी जिल्हा निवडा",
+  customCropLabel: "तुमचे पीक लिहा",
+  customCropPlaceholder: "उदा. ड्रॅगन फ्रूट",
+  searchingCities: "गावे शोधत आहोत...",
+  cityTypeHint: "या जिल्ह्यातील गावे शोधण्यासाठी किमान २ अक्षरे लिहा.",
+  cityUseTyped: '"{name}" तसेच वापरा',
+  errState: "कृपया राज्य निवडा.",
+  errDistrict: "कृपया जिल्हा निवडा.",
+  errCity: "कृपया शहर किंवा गाव निवडा.",
+  errCrop: "कृपया मुख्य पीक निवडा.",
+  errCustomCrop: "कृपया तुमच्या पिकाचे नाव लिहा.",
+};
+
+const SEL_HI: Dict = {
+  selectState: "राज्य चुनें",
+  selectDistrict: "जिला चुनें",
+  selectCity: "शहर / कस्बा चुनें",
+  selectMainCrop: "मुख्य फसल चुनें",
+  searchPlaceholder: "खोजने के लिए टाइप करें...",
+  noResults: "कुछ नहीं मिला",
+  clearSelection: "हटाएँ",
+  selectStateFirst: "पहले राज्य चुनें",
+  selectDistrictFirst: "पहले जिला चुनें",
+  customCropLabel: "अपनी फसल लिखें",
+  customCropPlaceholder: "जैसे ड्रैगन फ्रूट",
+  searchingCities: "कस्बे खोजे जा रहे हैं...",
+  cityTypeHint: "इस जिले के कस्बे खोजने के लिए कम से कम 2 अक्षर लिखें।",
+  cityUseTyped: '"{name}" ऐसे ही उपयोग करें',
+  errState: "कृपया राज्य चुनें।",
+  errDistrict: "कृपया जिला चुनें।",
+  errCity: "कृपया शहर या कस्बा चुनें।",
+  errCrop: "कृपया मुख्य फसल चुनें।",
+  errCustomCrop: "कृपया अपनी फसल का नाम लिखें।",
+};
+
+Object.assign(en, SEL_EN);
+Object.assign(mr, SEL_MR);
+Object.assign(hi, SEL_HI);
+
 const DICTS: Record<Lang, Dict> = { en, mr, hi };
 
 export const LANG_LABELS: Record<Lang, string> = { en: "English", mr: "मराठी", hi: "हिंदी" };
