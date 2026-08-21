@@ -9,10 +9,19 @@ export interface FarmerProfile {
   district: string;
   /** Specific city/town used for weather; falls back to district when empty. */
   city: string;
+  /** Coordinates of the selected city/town, used for live weather. */
+  lat?: number;
+  lon?: number;
   land: number;
+  /** Base crop guide key (derived from cropId). */
   crop: CropKey;
+  /** Selected crop from the full crop catalog. */
+  cropId?: string;
+  /** Free-text crop name when cropId is "other". */
+  cropCustom?: string;
   season: string;
 }
+
 
 export interface Task {
   id: string;
