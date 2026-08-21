@@ -7,6 +7,8 @@ const inputSchema = z.object({
   district: z.string().default(""),
   state: z.string().default(""),
   country: z.string().default("India"),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
 });
 
 interface GeoResult {
@@ -27,9 +29,14 @@ export const fetchWeather = createServerFn({ method: "GET" })
     const query = [data.city, data.district, data.state]
       .map((v) => v.trim())
       .filter(Boolean)[0];
-    if (!query) return { error: "invalidCity" };
+    if (!query && data.latitude === undefined) return { error: "invalidCity" };
 
     try {
+      let geo: GeoResult | undefined;
+      if (typeof data.latitude === "number" && typeof data.longitude === "number") {
+        geo = { latitude: data.latitude, longitude: data.longitude, name: query || data.district };
+      }
+      if (!geo) {
       const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(
         query,
       )}&count=1&language=en&format=json&country=IN`;
@@ -37,8 +44,9 @@ export const fetchWeather = createServerFn({ method: "GET" })
       if (geoRes.status === 429) return { error: "rateLimit" };
       if (!geoRes.ok) return { error: "unavailable" };
       const geoJson = (await geoRes.json()) as { results?: GeoResult[] };
-      const geo = geoJson.results?.[0];
+      geo = geoJson.results?.[0];
       if (!geo) return { error: "invalidCity" };
+      }
 
       const url =
         `https://api.open-meteo.com/v1/forecast?latitude=${geo.latitude}&longitude=${geo.longitude}` +
