@@ -1,606 +1,335 @@
-# KrushiSetu Companion
+# 🌾 KrushiSetu AI
 
-Build a complete, polished, responsive web application called KrushiSetu AI for the Hack Devengers 1.0 hackathon.
+### Smart Farming. Local Guidance. Better Decisions.
 
-PRODUCT IDEA
+KrushiSetu AI is a farmer-centric digital platform designed to help Indian farmers make better farming decisions through personalized crop guidance, location-based weather insights, AI assistance, government scheme discovery, and smart farm planning.
 
-KrushiSetu AI is a farmer-centric digital platform for Indian farmers.
+---
 
-Its goal is to help farmers make better farming decisions by providing:
+## 🚀 Key Features
 
-Personalized crop guidance
+### 👨‍🌾 Personalized Farmer Profile
 
-Government scheme discovery
+- Farmer Name
+- State
+- District
+- City/Town
+- Land Size
+- Main Crop
+- Season
+- Persistent profile after browser refresh
 
-AI agricultural assistance
+---
 
-Multilingual support
+### 📍 Smart Location
 
-Daily farming recommendations
+**State → District → City/Town**
 
-Simple farm task planning
+- Complete Indian State and Union Territory selection
+- Districts dynamically filtered according to the selected State
+- Searchable District selection
+- Searchable City/Town selection
+- Location-aware weather
+- Exact selected location used for weather information
 
-The application should feel like a real startup product, not a basic college project.
+---
 
-DESIGN DIRECTION
+### 🌦️ Live Weather
 
-Create a modern Agriculture + SaaS dashboard aesthetic.
+KrushiSetu AI provides weather information based on the farmer's selected City/Town.
 
-Use:
+Features include:
 
-Deep green as the primary color
+- Current temperature
+- Weather condition
+- Humidity
+- Rain probability
+- Wind speed
+- Weather forecast
+- Current date
+- Last updated time
+- Manual weather refresh
 
-Fresh green as the secondary color
+Weather information is connected to the farmer's selected location.
 
-Very light green/off-white background
+---
 
-White cards
+### 🌱 Smart Farming Advice
 
-Rounded corners
+KrushiSetu AI combines:
 
-Soft shadows
+**Location + Crop + Season + Weather**
 
-Clean typography
+to provide simple and farmer-friendly daily recommendations.
 
-Minimal and professional animations
+Examples include:
 
-Clear visual hierarchy
+- Soil moisture suggestions
+- Irrigation considerations
+- Rain-related suggestions
+- Crop inspection reminders
+- Weather-aware farming recommendations
 
-Farmer-friendly readable text
+---
 
-Avoid:
+### 🔔 Smart Farm Reminders
 
-Overly bright colors
+Farmers can:
 
-Excessive gradients
+- Add reminders
+- Complete reminders
+- Delete reminders
+- Track task progress
+- Review today's tasks
+- Receive weather-aware reminder suggestions
+- Keep reminders saved after browser refresh
 
-Cluttered layouts
+Example:
 
-Generic Bootstrap styling
+If an irrigation reminder exists and rain is expected, KrushiSetu AI can provide a weather-aware suggestion to check field conditions before irrigation.
 
-Too many animations
+---
 
-The website must be fully responsive on:
+### 🌾 Crop Guidance
 
-Desktop
+KrushiSetu AI provides guidance for a wide range of crops.
 
-Tablet
+Crop categories include:
 
-Mobile
+- Cereals
+- Pulses
+- Oilseeds
+- Vegetables
+- Fruits
+- Cash Crops
+- Spices
+- Plantation Crops
 
-Use high-quality agriculture-related visual elements where appropriate, but keep the interface fast and clean.
+Guidance includes:
 
-BRAND
+- 🌱 Sowing
+- 💧 Irrigation
+- 🌿 Fertilizer
+- 🐛 Pest Management
+- 🌾 Harvesting
 
-Name:
-KrushiSetu AI
+---
 
-Tagline:
-Smart Farming. Local Guidance. Better Decisions.
+### 🏛️ Government Scheme Discovery
 
-Create a simple professional logo/icon concept related to agriculture + connectivity/AI.
+Farmers can explore potentially relevant government schemes based on their profile.
 
-MAIN USER FLOW
+Each scheme can provide:
 
-The complete user journey should be:
+- Scheme Name
+- Description
+- Benefits
+- Basic Eligibility
+- Required Documents
+- View Details
+- Official Government Website
 
-Landing Page
-→ Get Started
-→ Farmer Profile Setup
-→ Personalized Dashboard
-→ Crop Guidance
-→ Government Scheme Matcher
-→ Krushi AI Assistant
-→ Today's Farming Advice
-→ Farm Action Planner
+Official eligibility should always be verified through the relevant government authority.
 
-Make navigation between these sections simple and intuitive.
+---
 
-1. LANDING PAGE
+### 🤖 Krushi AI
 
-Create a strong hero section.
+Krushi AI is an intelligent agricultural assistant designed to help farmers with:
 
-Include:
+- Crop-related questions
+- Farming practices
+- Crop management
+- Government schemes
+- Weather-related farming questions
+- General agricultural guidance
 
-KrushiSetu AI
+The application is prepared for AI API integration using environment variables.
 
-"Smart Farming. Local Guidance. Better Decisions."
+If the AI service is unavailable, a fallback/demo mode can be used so that the assistant remains usable during demonstrations.
 
-Supporting text explaining that KrushiSetu AI provides personalized agricultural guidance, government scheme discovery and AI-powered assistance for farmers.
+---
 
-Buttons:
+### 🌐 Multilingual Support
 
-Get Started
+KrushiSetu AI supports:
 
-Ask Krushi AI
+- English
+- मराठी
+- हिंदी
 
-Add a visually attractive agriculture-themed hero section.
+The language selector is available throughout the application.
 
-Below the hero, show four feature cards:
+The selected language is saved locally and restored after browser refresh.
 
-🌱 Crop Guidance
+---
 
-🏛️ Government Schemes
+### 📋 Smart Farm Planner
 
-🤖 Krushi AI
+Farmers can:
 
-📋 Smart Farm Planner
+- Add tasks
+- Complete tasks
+- Delete tasks
+- Track task progress
+- Review today's farm activities
 
-Add a short "How It Works" section:
+Example:
 
-Profile → Personalized Guidance → Take Action
+**3 / 5 Tasks Completed**
 
-Add a final CTA section.
+---
 
-2. FARMER PROFILE SETUP
+## 🧠 How KrushiSetu AI Works
 
-Create a clean multi-step or single-page profile form.
-
-Fields:
-
-Farmer Name
-
+```text
+Farmer Profile
+      ↓
 State
-
+      ↓
 District
-
-Land Size in hectares
-
-Main Crop
-
-Season
-
-Example profile:
-
-Name: Ramesh
-State: Maharashtra
-District: Nashik
-Land: 2 hectares
-Crop: Onion
-Season: Rabi
-
-Store the profile locally so that the user does not have to enter it every time.
-
-After completion, take the farmer to the personalized dashboard.
-
-3. PERSONALIZED DASHBOARD
-
-Create a professional dashboard.
-
-Show:
-
-"Good Morning, [Farmer Name] 👨‍🌾"
-
-Then display:
-
-Location
-
-Land size
-
-Current crop
-
-Season
-
-Create summary cards:
-
-Crop Status
-
-Good
-
-Today's Tasks
-
-Show completed/remaining tasks
-
-Relevant Schemes
-
-Number of potentially suitable schemes
-
-AI Assistant
-
-"Ask Krushi AI"
-
-Add a prominent section:
-
-Today's Farming Advice
-
-Generate advice based on:
-
-Farmer location
-
-Crop
-
-Season
-
-For the MVP, use local structured demo data instead of pretending to provide live weather or live agricultural data.
-
-4. CROP GUIDANCE
-
-Create a dedicated Crop Guidance page.
-
-Include crop cards for:
-
-Onion
-
-Wheat
-
-Tomato
-
-Soybean
-
-Cotton
-
-Rice
-
-When a crop is selected, show:
-
-🌱 Sowing
-
-💧 Irrigation
-
-🌿 Fertilizer
-
-🐛 Pest Management
-
-🌾 Harvesting
-
-Use simple farmer-friendly language.
-
-Allow the farmer to switch between crops.
-
-5. GOVERNMENT SCHEME MATCHER
-
-Create a Government Scheme section.
-
-Use a local structured demo dataset.
-
-Each scheme should have:
-
-Scheme name
-
-Description
-
-Benefits
-
-Basic eligibility
-
-Required documents
-
-View Details
-
-Use the farmer's profile to identify potentially relevant schemes.
-
-For example:
-
-Profile:
-Maharashtra
-2 hectares
-Onion farmer
-
-Then show schemes that may be relevant based on the demo eligibility rules.
-
-IMPORTANT:
-
-Do not claim that the farmer is officially eligible.
-
-Use wording such as:
-
-"Potentially suitable based on your profile."
-
-Add a disclaimer that official eligibility should be verified from the relevant government authority.
-
-6. KRUSHI AI ASSISTANT
-
-Create a polished chatbot interface.
-
-Title:
-
+      ↓
+City/Town
+      ↓
+Live Weather
+      ↓
+Crop + Season
+      ↓
+Smart Farming Advice
+      ↓
+Weather-aware Reminders
+      ↓
+Government Schemes
+      ↓
 Krushi AI
+      ↓
+Farm Action
+```
 
-Subtitle:
+---
 
-"Your intelligent farming assistant"
+## 🛠️ Tech Stack
 
-Features:
+- React
+- TypeScript
+- Tailwind CSS
+- Component-Based Architecture
+- Local Storage
+- Weather API
+- AI API Integration
+- Responsive Web Design
 
-Chat interface
+---
 
-User messages
+## 🏆 Hackathon Demo Flow
 
-AI responses
+The recommended hackathon demonstration flow is:
 
-Loading indicator
+1. Open KrushiSetu AI
+2. Click **Get Started**
+3. Create the farmer profile
+4. Select State
+5. Select District
+6. Select City/Town
+7. Select Main Crop
+8. Select Season
+9. Open the personalized Dashboard
+10. Check current weather
+11. Show Today's Farming Advice
+12. Check weather-aware reminders
+13. Open Crop Guidance
+14. Explore Government Schemes
+15. Open Scheme Details
+16. Visit the official government website
+17. Open Krushi AI
+18. Ask a farming question
+19. Open Farm Planner
+20. Complete a farm task
+21. Show task progress
 
-Error handling
+---
 
-Clear chat option
+## 🎯 Vision
 
-Example questions:
+KrushiSetu AI aims to make agricultural information easier to understand and more personalized for Indian farmers by connecting:
 
-"How often should I irrigate my onion crop?"
+**Local Context + Crop Information + Weather Insights + AI Assistance**
 
-"What should I check before harvesting?"
+into one simple and farmer-friendly digital platform.
 
-"Which scheme may be useful for my farm?"
+---
 
-"How can I improve my crop management?"
+## 🔗 Live Demo
 
-The interface should support farmer-friendly responses.
+**Lovable:**  
+https://krushisetu-ai.lovable.app
 
-Prepare the application for Gemini API integration.
+**Vercel:**  
+https://krushisetu-ai.vercel.app
 
-Use an environment variable for the API key.
+---
 
-Never hardcode API keys.
+## 💻 Development
 
-If the Gemini API is unavailable, create a Demo Mode that returns predefined useful farming responses so the feature still works during the hackathon presentation.
+### Clone the repository
 
-7. MULTILINGUAL SUPPORT
-
-Add a language selector in the navbar:
-
-English | मराठी | हिंदी
-
-Translate the main interface labels and common navigation elements.
-
-The selected language should persist locally.
-
-Prioritize Marathi because the initial target demo can focus on Maharashtra farmers.
-
-8. SMART FARM ACTION PLANNER
-
-Create a task management section.
-
-Title:
-
-Today's Farm Tasks
-
-Example tasks:
-
-Check soil moisture
-
-Inspect crop
-
-Check irrigation requirement
-
-Review fertilizer schedule
-
-Inspect for pests
-
-Features:
-
-Add task
-
-Complete task
-
-Delete task
-
-Progress indicator
-
-Example:
-
-3 / 5 Tasks Completed
-
-Store tasks locally.
-
-9. "WHAT SHOULD I DO TODAY?" FEATURE
-
-Create a visually prominent dashboard card:
-
-What should I do today?
-
-Based on:
-
-📍 Location
-🌱 Crop
-🌤️ Season
-
-Show 3–4 actionable recommendations.
-
-Example:
-
-Check soil moisture.
-
-Inspect leaves for signs of pests.
-
-Review irrigation requirements.
-
-Complete today's farm task.
-
-This should be one of the main features shown during the hackathon demo.
-
-10. NAVIGATION
-
-Create a responsive navbar/sidebar.
-
-Navigation:
-
-Home
-
-Dashboard
-
-Crop Guide
-
-Schemes
-
-Krushi AI
-
-Farm Planner
-
-Include:
-
-Language selector
-
-Farmer profile/avatar
-
-On mobile, use a clean mobile navigation menu.
-
-11. DATA
-
-For the initial MVP, use structured local data for:
-
-Crops
-
-Crop guidance
-
-Government schemes
-
-Demo AI responses
-
-Translations
-
-Today's farming advice
-
-Do not depend on external APIs for the core demo.
-
-The application should still work if there is no internet connection to external agricultural services.
-
-12. IMPORTANT PRODUCT PRINCIPLES
-
-Prioritize:
-
-Working MVP > unnecessary features
-
-The application should not contain fake buttons.
-
-Every visible button should either:
-
-Navigate somewhere
-
-Open a modal
-
-Submit data
-
-Perform an action
-
-Use realistic demo data.
-
-Keep the UI polished but simple.
-
-Make the application easy for a hackathon judge to understand within 2–3 minutes.
-
-13. HACKATHON DEMO
-
-The final demo should follow this exact story:
-
-Open KrushiSetu AI
-
-Click Get Started
-
-Enter farmer profile
-
-Select Maharashtra → Nashik → Onion → Rabi
-
-Open personalized dashboard
-
-Show Today's Farming Advice
-
-Open Crop Guidance
-
-Show Onion guidance
-
-Open Government Schemes
-
-Show potentially suitable schemes
-
-Open Krushi AI
-
-Ask a farming question
-
-Show AI/Demo response
-
-Open Farm Planner
-
-Complete a task
-
-Show progress
-
-The entire flow should feel connected and personalized.
-
-14. TECHNICAL REQUIREMENTS
-
-Use a modern React-based implementation suitable for Lovable.
-
-Use:
-
-React
-
-TypeScript if Lovable's default setup supports it
-
-Tailwind CSS if available
-
-Component-based architecture
-
-Local storage for persistence
-
-Keep the code modular.
-
-Do not add unnecessary dependencies.
-
-Make sure the project can later be deployed easily.
-
-15. QUALITY CHECK
-
-Before considering the MVP complete, verify:
-
-Landing page works
-
-Get Started works
-
-Farmer profile saves
-
-Dashboard is personalized
-
-Crop Guide works
-
-Scheme Matcher works
-
-Krushi AI interface works
-
-Demo AI mode works without API key
-
-Farm Planner works
-
-Tasks can be added/completed/deleted
-
-Language selector works
-
-Navigation works
-
-Mobile layout works
-
-No broken buttons
-
-No console errors
-
-No API keys are exposed
-
-All pages have consistent styling
-
-Build the application as a polished, realistic, farmer-first product.
-
-Start by creating the complete UI and working MVP using local/demo data.
-
-Do not wait for external APIs to build the core functionality.
-
-This project was built with [Lovable](https://lovable.dev).
-
-**Live app**: https://krushisetu-ai.lovable.app
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/f66836ec-95fd-48ec-9246-3a10e908cc14).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
-git clone <this-repository-url>
+```bash
+git clone <repository-url>
 cd <repository-name>
-npm i
+```
+
+### Install dependencies
+
+```bash
+npm install
+```
+
+### Start the development server
+
+```bash
 npm run dev
 ```
+
+---
+
+## 🔐 Environment Variables
+
+API keys and secrets should never be hardcoded or committed to GitHub.
+
+Use environment variables such as:
+
+```text
+VITE_GEMINI_API_KEY=your_api_key_here
+```
+
+Do not commit `.env` files containing real API keys.
+
+---
+
+## 📱 Responsive Design
+
+KrushiSetu AI is designed to work across:
+
+- 💻 Desktop
+- 📱 Mobile
+- 📲 Tablet
+
+The interface is designed to remain simple, readable, and farmer-friendly across different screen sizes.
+
+---
+
+## ⚠️ Disclaimer
+
+KrushiSetu AI provides informational agricultural guidance and should not be considered a substitute for professional agricultural advice.
+
+Government scheme eligibility, benefits, documents, and application requirements should always be verified through the relevant official government authority.
+
+Weather-based suggestions are informational and should not automatically determine farming decisions.
+
+---
+
+## 🌾 Built for Hack Devengers 1.0
+
+**KrushiSetu AI**
+
+**Smart Farming. Local Guidance. Better Decisions.**
