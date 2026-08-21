@@ -22,6 +22,9 @@ export function useWeather(profile: FarmerProfile | null) {
           district: profile.district,
           state: profile.state,
           country: "India",
+          ...(typeof profile.lat === "number" && typeof profile.lon === "number"
+            ? { latitude: profile.lat, longitude: profile.lon }
+            : {}),
         },
       });
       if (result && "error" in result) {
@@ -35,7 +38,7 @@ export function useWeather(profile: FarmerProfile | null) {
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile?.city, profile?.district, profile?.state, place]);
+  }, [profile?.city, profile?.district, profile?.state, profile?.lat, profile?.lon, place]);
 
   useEffect(() => {
     void load();

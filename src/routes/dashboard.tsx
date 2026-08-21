@@ -4,6 +4,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { WeatherCard } from "@/components/WeatherCard";
 import { matchSchemes } from "@/lib/data";
 import { getCrop, localizePlace, localizedAdvice } from "@/lib/content";
+import { cropName } from "@/lib/crops-catalog";
 import { formatLongDate, toDateKey } from "@/lib/date";
 import { useI18n } from "@/lib/i18n";
 import { REMINDER_EMOJI, useProfile, useReminders, useTasks } from "@/lib/store";
@@ -73,7 +74,11 @@ function Dashboard() {
 
   if (!profile) return <AppLayout><div className="h-64" /></AppLayout>;
 
-  const crop = getCrop(lang, profile.crop);
+  const baseCrop = getCrop(lang, profile.crop);
+  const crop = {
+    ...baseCrop,
+    name: cropName(lang, profile.cropId ?? profile.crop, profile.cropCustom),
+  };
   const schemes = matchSchemes(profile);
   const done = tasks.filter((x) => x.done).length;
   const advice = localizedAdvice(lang, profile.crop, profile.season, profile.city || profile.district);
