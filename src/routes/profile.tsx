@@ -1,10 +1,15 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { AppLayout } from "@/components/AppLayout";
-import { SEASONS, STATES, type CropKey } from "@/lib/data";
-import { getCrops, localizePlace } from "@/lib/content";
+import { SearchSelect, type SelectOption } from "@/components/SearchSelect";
+import { SEASONS } from "@/lib/data";
+import { INDIA_STATES } from "@/lib/india";
+import { CROP_CATALOG, CROP_CATEGORY_LABEL, baseCropKey } from "@/lib/crops-catalog";
+import { localizePlace } from "@/lib/content";
 import { useI18n } from "@/lib/i18n";
 import { useProfile } from "@/lib/store";
+import { searchPlaces, type PlaceResult } from "@/lib/places.functions";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -13,13 +18,15 @@ export const Route = createFileRoute("/profile")({
       {
         name: "description",
         content:
-          "Set up your farmer profile with state, district, land size, crop and season to unlock personalized guidance on KrushiSetu AI.",
+          "Set up your farmer profile with state, district, city, land size, crop and season to unlock personalized guidance on KrushiSetu AI.",
       },
       { property: "og:title", content: "Farmer Profile Setup — KrushiSetu AI" },
       {
         property: "og:description",
         content: "Create your farm profile to get personalized crop and scheme guidance.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: ProfilePage,
@@ -27,18 +34,24 @@ export const Route = createFileRoute("/profile")({
 
 function ProfilePage() {
   const { t, lang } = useI18n();
-  const CROPS = getCrops(lang);
   const navigate = useNavigate();
   const { profile, setProfile, clearProfile, loaded } = useProfile();
+  const runSearch = useServerFn(searchPlaces);
 
   const [name, setName] = useState("");
-  const [state, setState] = useState("Maharashtra");
-  const [district, setDistrict] = useState("Nashik");
-  const [city, setCity] = useState("Sinnar");
+  const [state, setState] = useState("");
+  const [district, setDistrict] = useState("");
+  const [city, setCity] = useState("");
+  const [coords, setCoords] = useState<{ lat?: number; lon?: number }>({});
   const [land, setLand] = useState("2");
-  const [crop, setCrop] = useState<CropKey>("onion");
+  const [cropId, setCropId] = useState("");
+  const [cropCustom, setCropCustom] = useState("");
   const [season, setSeason] = useState<string>("Rabi");
   const [error, setError] = useState("");
+
+  const [places, setPlaces] = useState<PlaceResult[]>([]);
+  const [placesLoading, setPlacesLoading] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (profile) {
@@ -46,42 +59,99 @@ function ProfilePage() {
       setState(profile.state);
       setDistrict(profile.district);
       setCity(profile.city || profile.district);
+      setCoords({ lat: profile.lat, lon: profile.lon });
       setLand(String(profile.land));
-      setCrop(profile.crop);
+      setCropId(profile.cropId ?? profile.crop);
+      setCropCustom(profile.cropCustom ?? "");
       setSeason(profile.season);
     }
   }, [profile]);
 
-  const districts = STATES[state] ?? [];
+  const stateOptions: SelectOption[] = useMemo(
+    () =>
+      Object.keys(INDIA_STATES).map((s) => ({ value: s, label: localizePlace(lang, s) })),
+    [lang],
+  );
+
+  const districtOptions: SelectOption[] = useMemo(
+    () =>
+      (INDIA_STATES[state] ?? []).map((d) => ({ value: d, label: localizePlace(lang, d) })),
+    [state, lang],
+  );
+
+  const cropOptions: SelectOption[] = useMemo(
+    () =>
+      CROP_CATALOG.map((c) => ({
+        value: c.id,
+        label: c[lang],
+        group: CROP_CATEGORY_LABEL[c.category][lang],
+      })),
+    [lang],
+  );
+
+  const cityOptions: SelectOption[] = useMemo(() => {
+    const rows = places.map((p) => ({ value: p.name, label: p.name }));
+    if (city && !rows.some((r) => r.value === city)) rows.unshift({ value: city, label: city });
+    return rows;
+  }, [places, city]);
+
+  const onCitySearch = (q: string) => {
+    if (timer.current) clearTimeout(timer.current);
+    if (q.trim().length < 2) {
+      setPlaces([]);
+      return;
+    }
+    setPlacesLoading(true);
+    timer.current = setTimeout(async () => {
+      try {
+        const res = await runSearch({ data: { query: q.trim(), state, district } });
+        setPlaces(res);
+      } catch {
+        setPlaces([]);
+      } finally {
+        setPlacesLoading(false);
+      }
+    }, 350);
+  };
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     const landNum = Number(land);
     if (!name.trim()) return setError(t("errName"));
+    if (!state) return setError(t("errState"));
+    if (!district) return setError(t("errDistrict"));
+    if (!city) return setError(t("errCity"));
     if (!Number.isFinite(landNum) || landNum <= 0) return setError(t("errLand"));
+    if (!cropId) return setError(t("errCrop"));
+    if (cropId === "other" && !cropCustom.trim()) return setError(t("errCustomCrop"));
     setError("");
     setProfile({
       name: name.trim(),
       state,
       district,
-      city: city.trim() || district,
+      city,
+      ...(coords.lat !== undefined && coords.lon !== undefined
+        ? { lat: coords.lat, lon: coords.lon }
+        : {}),
       land: landNum,
-      crop,
+      crop: baseCropKey(cropId),
+      cropId,
+      cropCustom: cropCustom.trim(),
       season,
     });
     navigate({ to: "/dashboard" });
   };
 
-
-  const field = "mt-1.5 h-11 w-full rounded-xl border border-input bg-card px-3 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/25";
+  const field =
+    "mt-1.5 h-11 w-full rounded-xl border border-input bg-card px-3 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/25";
 
   return (
     <AppLayout>
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
-        <h1 className="text-3xl font-bold tracking-tight">{profile ? t("editProfile") : t("createProfile")}</h1>
-        <p className="mt-2 text-muted-foreground">
-{t("profileIntro")}
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">
+          {profile ? t("editProfile") : t("createProfile")}
+        </h1>
+        <p className="mt-2 text-muted-foreground">{t("profileIntro")}</p>
 
         <form onSubmit={submit} className="card-soft mt-8 p-6 sm:p-8">
           <div className="grid gap-5 sm:grid-cols-2">
@@ -99,55 +169,56 @@ function ProfilePage() {
             </div>
 
             <div>
-              <label htmlFor="state" className="text-sm font-medium">
-                {t("state")}
-              </label>
-              <select
-                id="state"
+              <span className="text-sm font-medium">{t("state")}</span>
+              <SearchSelect
                 value={state}
-                onChange={(e) => {
-                  setState(e.target.value);
-                  setDistrict(STATES[e.target.value]?.[0] ?? "");
+                options={stateOptions}
+                placeholder={t("selectState")}
+                onChange={(v) => {
+                  setState(v);
+                  setDistrict("");
+                  setCity("");
+                  setCoords({});
+                  setPlaces([]);
                 }}
-                className={field}
-              >
-                {Object.keys(STATES).map((s) => (
-                  <option key={s} value={s}>{localizePlace(lang, s)}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="district" className="text-sm font-medium">
-                {t("district")}
-              </label>
-              <select
-                id="district"
-                value={district}
-                onChange={(e) => setDistrict(e.target.value)}
-                className={field}
-              >
-                {districts.map((d) => (
-                  <option key={d} value={d}>{localizePlace(lang, d)}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="city" className="text-sm font-medium">
-                {t("cityTown")}
-              </label>
-              <input
-                id="city"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder={t("cityPlaceholder")}
-                className={field}
               />
-              <p className="mt-1 text-xs text-muted-foreground">{t("cityHelp")}</p>
             </div>
 
+            <div>
+              <span className="text-sm font-medium">{t("district")}</span>
+              <SearchSelect
+                value={district}
+                options={districtOptions}
+                placeholder={t("selectDistrict")}
+                disabled={!state}
+                disabledHint={t("selectStateFirst")}
+                onChange={(v) => {
+                  setDistrict(v);
+                  setCity("");
+                  setCoords({});
+                  setPlaces([]);
+                }}
+              />
+            </div>
 
+            <div>
+              <span className="text-sm font-medium">{t("cityTown")}</span>
+              <SearchSelect
+                value={city}
+                options={cityOptions}
+                placeholder={t("selectCity")}
+                disabled={!district}
+                disabledHint={t("selectDistrictFirst")}
+                loading={placesLoading}
+                onSearch={onCitySearch}
+                onChange={(v) => {
+                  setCity(v);
+                  const hit = places.find((p) => p.name === v);
+                  setCoords(hit ? { lat: hit.latitude, lon: hit.longitude } : {});
+                }}
+              />
+              <p className="mt-1 text-xs text-muted-foreground">{t("cityTypeHint")}</p>
+            </div>
 
             <div>
               <label htmlFor="land" className="text-sm font-medium">
@@ -164,22 +235,28 @@ function ProfilePage() {
               />
             </div>
 
-            <div>
-              <label htmlFor="crop" className="text-sm font-medium">
-                {t("mainCrop")}
-              </label>
-              <select
-                id="crop"
-                value={crop}
-                onChange={(e) => setCrop(e.target.value as CropKey)}
-                className={field}
-              >
-                {CROPS.map((c) => (
-                  <option key={c.key} value={c.key}>
-                    {c.emoji} {c.name}
-                  </option>
-                ))}
-              </select>
+            <div className="sm:col-span-2">
+              <span className="text-sm font-medium">{t("mainCrop")}</span>
+              <SearchSelect
+                value={cropId}
+                options={cropOptions}
+                placeholder={t("selectMainCrop")}
+                onChange={setCropId}
+              />
+              {cropId === "other" && (
+                <div className="mt-3">
+                  <label htmlFor="cropCustom" className="text-sm font-medium">
+                    {t("customCropLabel")}
+                  </label>
+                  <input
+                    id="cropCustom"
+                    value={cropCustom}
+                    onChange={(e) => setCropCustom(e.target.value)}
+                    placeholder={t("customCropPlaceholder")}
+                    className={field}
+                  />
+                </div>
+              )}
             </div>
 
             <div className="sm:col-span-2">
@@ -218,6 +295,11 @@ function ProfilePage() {
                 onClick={() => {
                   clearProfile();
                   setName("");
+                  setState("");
+                  setDistrict("");
+                  setCity("");
+                  setCropId("");
+                  setCropCustom("");
                 }}
                 className="h-11 rounded-full border border-border px-6 text-sm font-medium text-muted-foreground hover:bg-accent"
               >
