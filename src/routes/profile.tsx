@@ -42,7 +42,7 @@ function ProfilePage() {
   const [state, setState] = useState("");
   const [district, setDistrict] = useState("");
   const [city, setCity] = useState("");
-  const [coords, setCoords] = useState<{ lat?: number; lon?: number }>({});
+  const [coords, setCoords] = useState<{ lat?: number | undefined; lon?: number | undefined }>({});
   const [land, setLand] = useState("2");
   const [cropId, setCropId] = useState("");
   const [cropCustom, setCropCustom] = useState("");

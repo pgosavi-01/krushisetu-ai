@@ -38,7 +38,7 @@ export const fetchWeather = createServerFn({ method: "GET" })
       }
       if (!geo) {
       const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(
-        query,
+        query ?? "",
       )}&count=1&language=en&format=json&country=IN`;
       const geoRes = await fetch(geoUrl);
       if (geoRes.status === 429) return { error: "rateLimit" };
