@@ -3,6 +3,7 @@ import { Bot, Send, Trash2, User } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { getCrop, localizePlace, localizedAnswer } from "@/lib/content";
+import { cropName } from "@/lib/crops-catalog";
 import { useI18n } from "@/lib/i18n";
 import { useProfile } from "@/lib/store";
 
@@ -57,7 +58,7 @@ function Assistant() {
       const prefix = profile
         ? t("aiPrefix", {
             land: profile.land,
-            crop: getCrop(lang, profile.crop).name,
+            crop: cropName(lang, profile.cropId ?? profile.crop, profile.cropCustom),
             district: localizePlace(lang, profile.district),
             state: localizePlace(lang, profile.state),
           })
